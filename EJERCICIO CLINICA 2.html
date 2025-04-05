@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salud Vital - Registro de Citas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        h2 {
+            color: #4CAF50;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form label {
+            margin: 5px 0;
+        }
+
+        form input, form select, form textarea {
+            padding: 10px;
+            margin: 5px 0 20px 0;
+            border: 1px solid #ddd;
+            width: 100%;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Consultorio Salud Vital</h1>
+    <p>Registra tu cita médica</p>
+</header>
+
+<main>
+    <h2>Formulario de Registro de Cita</h2>
+    <form id="formCita">
+        <label for="nombre">Nombre Completo:</label>
+        <input type="text" id="nombre" required>
+
+        <label for="edad">Edad:</label>
+        <input type="number" id="edad" required>
+
+        <label for="sexo">Sexo:</label>
+        <select id="sexo" required>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+        </select>
+
+        <label for="sangre">Tipo de Sangre:</label>
+        <input type="text" id="sangre" required>
+
+        <label for="ocupacion">Ocupación:</label>
+        <input type="text" id="ocupacion" required>
+
+        <label for="estadoCivil">Estado Civil:</label>
+        <input type="text" id="estadoCivil" required>
+
+        <label for="contacto">Número de Contacto:</label>
+        <input type="text" id="contacto" required>
+
+        <label for="correo">Correo Electrónico:</label>
+        <input type="email" id="correo" required>
+
+        <label for="motivo">Motivo de la Cita:</label>
+        <textarea id="motivo" required></textarea>
+
+        <label for="enfermedad">Enfermedad (si aplica):</label>
+        <input type="text" id="enfermedad">
+
+        <label for="urgencia">Nivel de Urgencia:</label>
+        <select id="urgencia" required>
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+        </select>
+
+        <label for="fecha">Fecha de la Cita:</label>
+        <input type="date" id="fecha" required>
+
+        <label for="hora">Hora de la Cita:</label>
+        <input type="time" id="hora" required>
+
+        <label for="tipoConsulta">Tipo de Consulta:</label>
+        <select id="tipoConsulta" required>
+            <option value="General">Consulta General</option>
+            <option value="Especialidad">Especialidad</option>
+            <option value="Otra">Otra</option>
+        </select>
+
+        <button type="submit">Registrar Cita</button>
+    </form>
+
+    <div id="citasList">
+        <h3>Citas Registradas</h3>
+        <ul id="citas">
+            <!-- Las citas registradas se mostrarán aquí -->
+        </ul>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Salud Vital. Todos los derechos reservados.</p>
+</footer>
+
+<script>
+    document.getElementById('formCita').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const nuevaCita = {
+            nombre: document.getElementById('nombre').value,
+            edad: document.getElementById('edad').value,
+            sexo: document.getElementById('sexo').value,
+            sangre: document.getElementById('sangre').value,
+            ocupacion: document.getElementById('ocupacion').value,
+            estadoCivil: document.getElementById('estadoCivil').value,
+            contacto: document.getElementById('contacto').value,
+            correo: document.getElementById('correo').value,
+            motivo: document.getElementById('motivo').value,
+            enfermedad: document.getElementById('enfermedad').value,
+            urgencia: document.getElementById('urgencia').value,
+            fecha: document.getElementById('fecha').value,
+            hora: document.getElementById('hora').value,
+            tipoConsulta: document.getElementById('tipoConsulta').value
+        };
+
+        // Enviar los datos al backend (API de citas)
+        fetch('http://localhost:5000/api/citas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(nuevaCita)
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('Cita registrada:', data);
+            mostrarCitas();
+        });
+    });
+
+    // Función para mostrar las citas registradas
+    function mostrarCitas() {
+        fetch('http://localhost:5000/api/citas')
+        .then(res => res.json())
+        .then(citas => {
+            const citasList = document.getElementById('citas');
+            citasList.innerHTML = '';
+            citas.forEach(cita => {
+                const li = document.createElement('li');
+                li.textContent = `${cita.nombre} - ${cita.fecha} ${cita.hora}`;
+                citasList.appendChild(li);
+            });
+        });
+    }
+
+    // Cargar citas al inicio
+    mostrarCitas();
+</script>
+
+</body>
+</html>
